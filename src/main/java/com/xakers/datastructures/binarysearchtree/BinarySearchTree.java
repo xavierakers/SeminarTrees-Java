@@ -6,20 +6,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A generic Binary Search Tree (BST) implementation that support various operations.
+ * It allows inserting key-value pairs, searching by key, removing by key or key-value,
+ * and performing rage and multi-search queries.
  *
- * @param <K>
- * @param <V>
+ * @param <K> Type of keys in the tree (must be Comparable)
+ * @param <V> Type of values associated with the keys
+ * @author Xavier Akers
+ * @version 2025-01-06
+ * @since 2025-01-04
  */
 public class BinarySearchTree<K extends Comparable<K>, V> {
     private class BSTNode {
-        private Record<K, V> data;
-        private BSTNode left;
-        private BSTNode right;
+        private Record<K, V> data;  // Data held in the node
+        private BSTNode left;       // Left child node
+        private BSTNode right;      // Right child node
 
         /**
+         * Constructor to create a new BST node.
          *
-         * @param key
-         * @param value
+         * @param key   The key for the new node
+         * @param value The value for the new node
          */
         public BSTNode(K key, V value) {
             this.data = new Record<>(key, value);
@@ -28,59 +35,65 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         }
 
         /**
+         * Returns the record associated with the node.
          *
-         * @return
+         * @return The record of the node.
          */
         public Record<K, V> getData() {
             return data;
         }
 
         /**
+         * Sets the record associated with the node.
          *
-         * @param data
+         * @param data The record for the node
          */
         public void setData(Record<K, V> data) {
             this.data = data;
         }
 
         /**
+         * Returns the left child associated with the node.
          *
-         * @return
+         * @return The left child of the node.
          */
         public BSTNode getLeft() {
             return left;
         }
 
         /**
+         * Sets the left child associated with the node.
          *
-         * @param left
+         * @param left The left child of the node.
          */
         public void setLeft(BSTNode left) {
             this.left = left;
         }
 
         /**
+         * Returns the right child associated with the node.
          *
-         * @return
+         * @return The right child of the node.
          */
         public BSTNode getRight() {
             return right;
         }
 
         /**
+         * Sets the right child associated with the node.
          *
-         * @param right
+         * @param right The right child of the node.
          */
         public void setRight(BSTNode right) {
             this.right = right;
         }
     }
 
-    private BSTNode root;
-    private int numNodes;
+    private BSTNode root;   // Root of the BST
+    private int numNodes;   // Number of nodes in the BST
 
     /**
-     *
+     * Constructs an empty BST
      */
     public BinarySearchTree() {
         this.root = null;
@@ -88,9 +101,11 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Inserts a new key-value pair into the tree.
+     * This method does not ensure uniqueness; duplicate keys are allowed.
      *
-     * @param key
-     * @param value
+     * @param key   THe key to be inserted.
+     * @param value The value associated with the key.
      */
     public void insert(K key, V value) {
         this.root = insert(root, key, value);
@@ -98,10 +113,12 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Inserts a new key-value pair into the tree, ensuring uniqueness.
+     * If the key already exists, it will not be inserted again.
      *
-     * @param key
-     * @param value
-     * @return
+     * @param key   The key to be inserted.
+     * @param value The value associated with the key.
+     * @return True if the node was successfully inserted, false if the key already exists.
      */
     public boolean insertUnique(K key, V value) {
         boolean[] inserted = new boolean[1];
@@ -111,20 +128,22 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Searches for a value associated with the given key.
      *
-     * @param key
-     * @return
+     * @param key The key to search for
+     * @return The value associated with the key, or null if the key is not found.
      */
     public V search(K key) {
         return search(root, key);
     }
 
     /**
+     * Searches for all values within the specified range of keys.
      *
-     * @param low
-     * @param high
-     * @param count
-     * @return
+     * @param low   The lower bound of the range (inclusive).
+     * @param high  The upper bound of the range(inclusive).
+     * @param count An array used to count the number of nodes visited during the search.
+     * @return A list of values within the specified range.
      */
     public List<V> search(K low, K high, int[] count) {
         List<V> results = new ArrayList<>();
@@ -134,9 +153,10 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Searches for all values associated with the given key, returning duplicates if any.
      *
-     * @param key
-     * @return
+     * @param key The key to search for.
+     * @return A list of values associated with the key.
      */
     public List<V> multiSearch(K key) {
         List<V> results = new ArrayList<>();
@@ -145,29 +165,34 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Removes a node with the specified key from the tree.
+     * The method returns a value associated with the removed key.
      *
-     * @param key
-     * @return
+     * @param key The key of the node to be removed.
+     * @return The value of the removed ode, or null if the key is not found.
      */
     public V remove(K key) {
         List<V> deletedValue = new ArrayList<>(1);
 
         this.root = removeByKey(this.root, key, deletedValue);
 
-        return deletedValue.isEmpty() ? null : deletedValue.get(0);
+        return deletedValue.isEmpty() ? null : deletedValue.getFirst();
     }
 
     /**
+     * Removes a specific key-value pair from the tree.
+     * Used for when there are duplicate keys in the tree.
      *
-     * @param key
-     * @param value
+     * @param key   The key to be removed.
+     * @param value The value to be removed.
      */
     public void remove(K key, V value) {
         this.root = removeByKeyValue(this.root, key, value);
     }
 
     /**
-     *
+     * Prints the entire tree structure in a human-readable format.
+     * It also displays the total number of records in the tree.
      */
     public void dump() {
         if (root == null) {
@@ -179,12 +204,17 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         System.out.printf("Number of records: %d\n", numNodes);
     }
 
+    // ----------------------------------------------------------
+    // Private Helper Methods
+    // ----------------------------------------------------------
+
     /**
+     * Helper method to insert a key-value pair into the tree.
      *
-     * @param node
-     * @param key
-     * @param value
-     * @return
+     * @param node  The current node in the tree.
+     * @param key   The key to be inserted.
+     * @param value The value to be inserted.
+     * @return The updated tree node.
      */
     private BSTNode insert(BSTNode node, K key, V value) {
         // If node is null, create new node
@@ -202,12 +232,13 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Helper method to insert a key-value pair into the tree, ensuring uniqueness.
      *
-     * @param node
-     * @param key
-     * @param value
-     * @param inserted
-     * @return
+     * @param node     The current node in the tree.
+     * @param key      The key to be inserted.
+     * @param value    The value to be inserted.
+     * @param inserted A flag indicating if the node was inserted.
+     * @return The updated tree node.
      */
     private BSTNode insertUnique(BSTNode node, K key, V value, boolean[] inserted) {
         // If node is null, create new node
@@ -230,10 +261,11 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Helper method to search for a key in the tree.
      *
-     * @param node
-     * @param key
-     * @return
+     * @param node The current node.
+     * @param key  The key to search for.
+     * @return The value associated with the key, or null if the key is not found.
      */
     private V search(BSTNode node, K key) {
         if (node == null) return null;
@@ -247,12 +279,13 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Helper method for performing a range search in the tree.
      *
-     * @param node
-     * @param low
-     * @param high
-     * @param results
-     * @param count
+     * @param node    The current node.
+     * @param low     The lower bound of the range.
+     * @param high    The upper bound of the range.
+     * @param results A list to store the values within the range.
+     * @param count   An array used to count the number of nodes visited during the search.
      */
     private void rangeSearch(BSTNode node, K low, K high, List<V> results, int[] count) {
         count[0]++;
@@ -278,10 +311,11 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Helper method to perform a multi-search for a specific key.
      *
-     * @param node
-     * @param key
-     * @param results
+     * @param node    The current node.
+     * @param key     The key to search for.
+     * @param results A list to store the values associated with the keys.
      */
     private void multiSearch(BSTNode node, K key, List<V> results) {
         if (node == null) return;
@@ -297,11 +331,12 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Helper method to remove a node by key and return its associated value.
      *
-     * @param node
-     * @param key
-     * @param deletedValue
-     * @return
+     * @param node         The current node.
+     * @param key          THe key to be removed.
+     * @param deletedValue A list to store the value of the deleted node.
+     * @return The updated tree node.
      */
     private BSTNode removeByKey(BSTNode node, K key, List<V> deletedValue) {
         if (node == null) return null;
@@ -331,11 +366,12 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * Helper method to remove a node by key-value pair.
      *
-     * @param node
-     * @param key
-     * @param value
-     * @return
+     * @param node  The current node.
+     * @param key   The key to be removed.
+     * @param value The value to be removed.
+     * @return The updated node.
      */
     private BSTNode removeByKeyValue(BSTNode node, K key, V value) {
         if (node == null) return null;
@@ -363,6 +399,12 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         return node;
     }
 
+    /**
+     * Helper method to print the tree.
+     *
+     * @param node  The current node.
+     * @param level The current level in the tree.
+     */
     private void dump(BSTNode node, int level) {
         if (node == null) {
             for (int i = 0; i < level; i++) {
@@ -382,11 +424,16 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
 
     }
 
+    /**
+     * Helper method to find the maximum value node in a subtree.
+     *
+     * @param node The root node of the subtree.
+     * @return THe maximum value node.
+     */
     private BSTNode getMaxNode(BSTNode node) {
         while (node.getRight() != null) {
             node = node.getRight();
         }
-
         return node;
     }
 }
