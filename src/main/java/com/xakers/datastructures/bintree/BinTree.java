@@ -5,14 +5,37 @@ import main.java.com.xakers.model.Seminar;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a spatial binary tree for organizing two-dimensional data (assumes Seminar object)
+ * based on coordinates (x, y). The tree alternates splitting by x and y
+ * coordinates at each level to partition the space effectively.
+ * <p>
+ * This implementation supports operations such as insertion, deletion,
+ * and searching within the defined spatial boundaries.
+ *
+ * @author Xavier Akers
+ * @version 2025-01-08
+ * @since 2025-01-06
+ */
 public class BinTree {
 
-    private BTNode root;
+    private BTNode root;    // Root node of the binary tree
+    // Shared singleton instance representing an empty node in the tree
     private static final BTNode EMPTY_NODE = BTEmptyNode.getInstance();
-    private final int xMax;
-    private final int yMax;
+    private final int xMax; // Maximum x-coordinate boundary
+    private final int yMax; // Maximum y-coordinate boundary
 
+    /**
+     * Constructs an empty spatial binary tree with defined boundaries.
+     * The tree initially has no nodes other than the {@code EMPTY_NODE}.
+     *
+     * @param xMax The maximum x-coordinate boundary for the spatial region.
+     * @param yMax The maximum y-coordinate boundary for the spatial region.
+     */
     public BinTree(int xMax, int yMax) {
+        if (xMax <= 0 || yMax <= 0) {
+            throw new IllegalArgumentException("error: worldSize must be greater than 0.");
+        }
         this.root = EMPTY_NODE;
         this.xMax = xMax;
         this.yMax = yMax;
@@ -48,53 +71,17 @@ public class BinTree {
         return results;
     }
 
+    /**
+     * Removes a key from the tree.
+     *
+     * @param key The key to be removed.
+     * @param x   X-coordinate of the key to be removed.
+     * @param y   Y-coordinate of the key to be removed.
+     */
     public void remove(int key, int x, int y) {
         this.root = remove(this.root, key, x, y, xMax / 2, yMax / 2, xMax / 2, yMax / 2, 0);
     }
 
-    private BTNode remove(BTNode node, int key, int x, int y,
-                          int xDiscrim, int yDiscrim,
-                          int width, int height, int level) {
-        if (node == EMPTY_NODE) return node;
-
-        if (node.isLeaf())
-            return removeLeafNode((BTLeafNode) node, key);
-        else
-            return removeInternalNode((BTInternalNode) node, key, x, y, xDiscrim, yDiscrim, width, height, level);
-
-    }
-
-    private BTNode removeLeafNode(BTLeafNode leafNode, int key) {
-        if (leafNode.remove(key) && !leafNode.isEmpty()) return leafNode;
-        return EMPTY_NODE;
-    }
-
-    private BTNode removeInternalNode(BTInternalNode internalNode, int key, int x, int y,
-                                      int xDiscrim, int yDiscrim,
-                                      int width, int height, int level) {
-        if (level % 2 == 0) {
-            if (x < xDiscrim) {
-                internalNode.setLeft(remove(internalNode.getLeft(), key, x, y,
-                        xDiscrim - (width / 2), yDiscrim, width / 2, height, level + 1));
-            } else {
-                internalNode.setRight(remove(internalNode.getRight(), key, x, y,
-                        xDiscrim + (width / 2), yDiscrim, width / 2, height, level + 1));
-            }
-        } else {
-            if (y < yDiscrim) {
-                internalNode.setLeft(remove(internalNode.getLeft(), key, x, y,
-                        xDiscrim, yDiscrim - (height / 2), width, height / 2, level + 1));
-            } else {
-                internalNode.setRight(remove(internalNode.getRight(), key, x, y,
-                        xDiscrim, yDiscrim + (height / 2), width, height / 2, level + 1));
-            }
-        }
-
-        if (internalNode.getLeft() == EMPTY_NODE && internalNode.getRight() == EMPTY_NODE) {
-            return EMPTY_NODE;
-        }
-        return internalNode;
-    }
 
     /**
      * Dumps the entire binary tree structure to the console, starting from the root.
@@ -104,9 +91,12 @@ public class BinTree {
         dump(root, 0);
     }
 
+    // ----------------------------------------------------------
+    // Private Helper Methods
+    // ----------------------------------------------------------
 
     /**
-     * Handles insertion logic for both leaf and internal nodes
+     * Helper method to handle insertion logic for both leaf and internal nodes
      *
      * @param node        the current node
      * @param seminarNode the seminar node to insert
@@ -137,7 +127,7 @@ public class BinTree {
 
 
     /**
-     * Handles insertion when the current node is a leaf
+     * Helper method to handle insertion when the current node is a leaf
      * If the new seminar has the same coordinates as the existing seminar in the leaf,
      * it is added to the list of seminars at that coordinate
      * Otherwise, the leaf is converted into an internal node, and both the existing and new seminar are re-insterted
@@ -172,7 +162,7 @@ public class BinTree {
     }
 
     /**
-     * Handles insertion when the current node is an internal node.
+     * Helper method to handle insertion when the current node is an internal node.
      * Determines whether to continue in the left or right subtree based on the coordinate discriminator.
      *
      * @param internalNode the current internal node
@@ -210,7 +200,7 @@ public class BinTree {
     }
 
     /**
-     * Recursively searches the tree for seminars within a given radius
+     * Helper method to recursively search the tree for seminars within a given radius
      *
      * @param node     Current node in the tree
      * @param x        X-coordinate of query point
@@ -242,7 +232,7 @@ public class BinTree {
     }
 
     /**
-     * Searches a leaf node for seminars within a given radius
+     * Helper method to search a leaf node for seminars within a given radius
      *
      * @param leafNode Leaf node to search
      * @param x        X-coordinate of query point
@@ -266,7 +256,7 @@ public class BinTree {
     }
 
     /**
-     * Recursively searches an internal node's children based on the query point
+     * Helper method to recursively search an internal node's children based on the query point
      *
      * @param internalNode Internal Node to search
      * @param x            X-coordinate of query point
@@ -293,6 +283,88 @@ public class BinTree {
                 search(internalNode.getRight(), x, y, radius, xDiscrim, yDiscrim + (yMax / (1 << (level + 1))), level, results, count);
 
         }
+    }
+
+    /**
+     * Helper method to remove a node with the specified key from the binary tree.
+     *
+     * @param node     The current node.
+     * @param key      The key to be removed.
+     * @param x        X-coordinate of the key's location.
+     * @param y        Y-coordinate of the key's location.
+     * @param xDiscrim X-coordinate of current discriminator.
+     * @param yDiscrim Y-coordinate of current discriminator.
+     * @param width    The width of the region.
+     * @param height   The height of the region.
+     * @param level    The current tree level.
+     * @return The updated tree node.
+     */
+    private BTNode remove(BTNode node, int key, int x, int y,
+                          int xDiscrim, int yDiscrim,
+                          int width, int height, int level) {
+        if (node == EMPTY_NODE) return node;
+
+        if (node.isLeaf())
+            return removeLeafNode((BTLeafNode) node, key);
+        else
+            return removeInternalNode((BTInternalNode) node, key, x, y, xDiscrim, yDiscrim, width, height, level);
+
+    }
+
+    /**
+     * Helper method to remove a key from a leaf node. If the leaf becomes empty after removal,
+     * it is replaced with the EMPTY_NODE.
+     *
+     * @param leafNode The leaf node from which to remove the key.
+     * @param key      The key to remove.
+     * @return The updated tree node.
+     */
+    private BTNode removeLeafNode(BTLeafNode leafNode, int key) {
+        if (leafNode.remove(key) && !leafNode.isEmpty()) return leafNode;
+        return EMPTY_NODE;
+    }
+
+
+    /**
+     * Helper method to remove a key from an internal node and adjusts the tree structure as needed.
+     * Decides whether ot traverse left or right based on the current level and coordinates.
+     *
+     * @param internalNode The internal node from which to remove the key.
+     * @param key          The key to remove.
+     * @param x            X-coordinate of the key's location.
+     * @param y            Y-coordinate of the key's location.
+     * @param xDiscrim     X-coordinate of current discriminator.
+     * @param yDiscrim     Y-coordinate of current discriminator.
+     * @param width        The width of the region.
+     * @param height       The height of the region.
+     * @param level        The current tree level.
+     * @return The updated tree node.
+     */
+    private BTNode removeInternalNode(BTInternalNode internalNode, int key, int x, int y,
+                                      int xDiscrim, int yDiscrim,
+                                      int width, int height, int level) {
+        if (level % 2 == 0) {
+            if (x < xDiscrim) {
+                internalNode.setLeft(remove(internalNode.getLeft(), key, x, y,
+                        xDiscrim - (width / 2), yDiscrim, width / 2, height, level + 1));
+            } else {
+                internalNode.setRight(remove(internalNode.getRight(), key, x, y,
+                        xDiscrim + (width / 2), yDiscrim, width / 2, height, level + 1));
+            }
+        } else {
+            if (y < yDiscrim) {
+                internalNode.setLeft(remove(internalNode.getLeft(), key, x, y,
+                        xDiscrim, yDiscrim - (height / 2), width, height / 2, level + 1));
+            } else {
+                internalNode.setRight(remove(internalNode.getRight(), key, x, y,
+                        xDiscrim, yDiscrim + (height / 2), width, height / 2, level + 1));
+            }
+        }
+
+        if (internalNode.getLeft() == EMPTY_NODE && internalNode.getRight() == EMPTY_NODE) {
+            return EMPTY_NODE;
+        }
+        return internalNode;
     }
 
     /**
@@ -323,7 +395,7 @@ public class BinTree {
      * @param y1 Y-coordinate of the first point
      * @param x2 X-coordinate of the second point
      * @param y2 Y-coordinate of the second point
-     * @return
+     * @return The squared Euclidean distance between two points.
      */
     private double distanceSq(int x1, int y1, int x2, int y2) {
         return (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
