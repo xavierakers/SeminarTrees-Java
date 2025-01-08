@@ -1,23 +1,22 @@
 package main.java.com.xakers.model;
 
 /**
- * Seminar class with getter methods for key fields. There is probably no
- * good reason why you would want to modify this class for your project.
+ * Seminar class with getter methods for key fields.
  *
  * @author CS3114/CS5040 staff
  * @version July 2023, last updated September 2023
  */
 
 public class Seminar {
-    private String title; // Semianar title
-    private String date; // Seminar date
-    private int length; // Seminar length
-    private String[] keywords; // Seminar keywords
-    private short x; // Seminar x coord
-    private short y; // Seminar y coord
-    private String desc; // Seminar description
-    private int cost; // Seminar cost
-    private int id; // Seminar ID
+    private String title;       // Semianar title
+    private String date;        // Seminar date
+    private int length;         // Seminar length
+    private String[] keywords;  // Seminar keywords
+    private short x;            // Seminar x coord
+    private short y;            // Seminar y coord
+    private String desc;        // Seminar description
+    private int cost;           // Seminar cost
+    private int id;             // Seminar ID
 
     // ----------------------------------------------------------
 
