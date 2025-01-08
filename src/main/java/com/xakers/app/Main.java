@@ -6,7 +6,7 @@ package main.java.com.xakers.app;
  *
  * @author Xavier Akers
  * @version 2025-01-08
- * @since 2025-1-05
+ * @since 2025-01-05
  */
 public class Main {
 
