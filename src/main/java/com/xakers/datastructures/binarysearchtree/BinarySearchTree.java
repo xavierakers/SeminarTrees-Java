@@ -5,38 +5,72 @@ import main.java.com.xakers.model.Record;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * @param <K>
+ * @param <V>
+ */
 public class BinarySearchTree<K extends Comparable<K>, V> {
     private class BSTNode {
         private Record<K, V> data;
         private BSTNode left;
         private BSTNode right;
 
+        /**
+         *
+         * @param key
+         * @param value
+         */
         public BSTNode(K key, V value) {
             this.data = new Record<>(key, value);
             this.left = null;
             this.right = null;
         }
 
+        /**
+         *
+         * @return
+         */
         public Record<K, V> getData() {
             return data;
         }
 
+        /**
+         *
+         * @param data
+         */
         public void setData(Record<K, V> data) {
             this.data = data;
         }
 
+        /**
+         *
+         * @return
+         */
         public BSTNode getLeft() {
             return left;
         }
 
+        /**
+         *
+         * @param left
+         */
         public void setLeft(BSTNode left) {
             this.left = left;
         }
 
+        /**
+         *
+         * @return
+         */
         public BSTNode getRight() {
             return right;
         }
 
+        /**
+         *
+         * @param right
+         */
         public void setRight(BSTNode right) {
             this.right = right;
         }
@@ -45,16 +79,30 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
     private BSTNode root;
     private int numNodes;
 
+    /**
+     *
+     */
     public BinarySearchTree() {
         this.root = null;
         this.numNodes = 0;
     }
 
+    /**
+     *
+     * @param key
+     * @param value
+     */
     public void insert(K key, V value) {
         this.root = insert(root, key, value);
         this.numNodes++;
     }
 
+    /**
+     *
+     * @param key
+     * @param value
+     * @return
+     */
     public boolean insertUnique(K key, V value) {
         boolean[] inserted = new boolean[1];
         this.root = insertUnique(root, key, value, inserted);
@@ -62,12 +110,22 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         return inserted[0];
     }
 
-    // Exact Search
+    /**
+     *
+     * @param key
+     * @return
+     */
     public V search(K key) {
         return search(root, key);
     }
 
-    // Range Search
+    /**
+     *
+     * @param low
+     * @param high
+     * @param count
+     * @return
+     */
     public List<V> search(K low, K high, int[] count) {
         List<V> results = new ArrayList<>();
         count[0] = 0;
@@ -75,13 +133,22 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         return results;
     }
 
-    // Multi Search
+    /**
+     *
+     * @param key
+     * @return
+     */
     public List<V> multiSearch(K key) {
         List<V> results = new ArrayList<>();
         multiSearch(this.root, key, results);
         return results;
     }
 
+    /**
+     *
+     * @param key
+     * @return
+     */
     public V remove(K key) {
         List<V> deletedValue = new ArrayList<>(1);
 
@@ -90,10 +157,18 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         return deletedValue.isEmpty() ? null : deletedValue.get(0);
     }
 
+    /**
+     *
+     * @param key
+     * @param value
+     */
     public void remove(K key, V value) {
-        return;
+        this.root = removeByKeyValue(this.root, key, value);
     }
 
+    /**
+     *
+     */
     public void dump() {
         if (root == null) {
             System.out.println("This tree is empty");
@@ -104,6 +179,13 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         System.out.printf("Number of records: %d\n", numNodes);
     }
 
+    /**
+     *
+     * @param node
+     * @param key
+     * @param value
+     * @return
+     */
     private BSTNode insert(BSTNode node, K key, V value) {
         // If node is null, create new node
         if (node == null) return new BSTNode(key, value);
@@ -119,6 +201,14 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         return node;
     }
 
+    /**
+     *
+     * @param node
+     * @param key
+     * @param value
+     * @param inserted
+     * @return
+     */
     private BSTNode insertUnique(BSTNode node, K key, V value, boolean[] inserted) {
         // If node is null, create new node
         if (node == null) {
@@ -139,6 +229,12 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
 
     }
 
+    /**
+     *
+     * @param node
+     * @param key
+     * @return
+     */
     private V search(BSTNode node, K key) {
         if (node == null) return null;
 
@@ -150,6 +246,14 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         return node.getData().getValue();
     }
 
+    /**
+     *
+     * @param node
+     * @param low
+     * @param high
+     * @param results
+     * @param count
+     */
     private void rangeSearch(BSTNode node, K low, K high, List<V> results, int[] count) {
         count[0]++;
 
@@ -173,6 +277,12 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         }
     }
 
+    /**
+     *
+     * @param node
+     * @param key
+     * @param results
+     */
     private void multiSearch(BSTNode node, K key, List<V> results) {
         if (node == null) return;
 
@@ -186,6 +296,13 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
 
     }
 
+    /**
+     *
+     * @param node
+     * @param key
+     * @param deletedValue
+     * @return
+     */
     private BSTNode removeByKey(BSTNode node, K key, List<V> deletedValue) {
         if (node == null) return null;
 
@@ -213,6 +330,13 @@ public class BinarySearchTree<K extends Comparable<K>, V> {
         return node;
     }
 
+    /**
+     *
+     * @param node
+     * @param key
+     * @param value
+     * @return
+     */
     private BSTNode removeByKeyValue(BSTNode node, K key, V value) {
         if (node == null) return null;
 
