@@ -10,18 +10,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * SeminarDB class represents a database of seminars
+ * Operations include insert, delete, search, and print
+ * based on different attributes such as ID, cost, date, keyword, and location
+ *
+ * @author Xavier Akers
+ * @version 2025-01-08
+ * @since 2025-01-03
+ */
 public class SeminarDB {
-    private final int worldSize;
-    private final BinarySearchTree<Integer, Seminar> idBST;
-    private final BinarySearchTree<Integer, Seminar> costBST;
-    private final BinarySearchTree<String, Seminar> dateBST;
-    private final BinarySearchTree<String, Seminar> keywordBST;
-    private final BinTree locationBT;
+    private final int worldSize;                                // Size of bounding box for the spatial binary tree
+    private final BinarySearchTree<Integer, Seminar> idBST;     // BST for searching by seminar ID
+    private final BinarySearchTree<Integer, Seminar> costBST;   // BST for searching by seminar cost
+    private final BinarySearchTree<String, Seminar> dateBST;    // BST for searching by seminar date
+    private final BinarySearchTree<String, Seminar> keywordBST; // BST for searching by seminar keyword
+    private final BinTree locationBT;                           // Binary Tree for storing seminar location
 
     /**
-     * Constructor
+     * Constructor to initialize the SeminarDB with a specified world size
      *
-     * @param worldSize Bounding box size for BinTree
+     * @param worldSize The size of the bounding box for the spatial binary tree
      */
     public SeminarDB(int worldSize) {
         this.worldSize = worldSize;
@@ -32,34 +41,42 @@ public class SeminarDB {
         this.locationBT = new BinTree(worldSize, worldSize);
     }
 
+    /**
+     * Load commands from a file and processes each command (insert, search, delete, print)
+     *
+     * @param filename The file path containing the commands
+     */
     public void load(String filename) {
         try (Scanner sc = new Scanner(new File(filename))) {
+            // Read and process each line
             while (sc.hasNextLine()) {
                 String[] line = sc.nextLine().trim().split("\\s+");
                 if (line.length < 2) {
-                    continue;
+                    continue; // Skip line with insufficient arguments
                 }
 
                 String command = line[0];
+                // Process commands based on the first word (command)
                 switch (command) {
                     case "insert": {
-                        Seminar seminar = parseInputCommand(sc, line);
+                        Seminar seminar = parseInputCommand(sc, line); // Parse semiar details and insert
                         processInsert(seminar);
                         break;
                     }
                     case "search": {
-                        String type = line[1];
+                        String type = line[1]; // Type of serach (ID, date, cost, etc.)
                         String[] searchArgs = Arrays.copyOfRange(line, 2, line.length);
-                        processSearch(type, searchArgs);
+                        processSearch(type, searchArgs); // Performs the search
+                        break;
                     }
-                    break;
                     case "delete": {
-                        int key = Integer.parseInt(line[1]);
-                        processDelete(key);
+                        int key = Integer.parseInt(line[1]); // ID of seminar to delete
+                        processDelete(key); // Delete the seminar
                         break;
                     }
                     case "print": {
-                        processPrint(line[1]);
+                        String type = line[1];
+                        processPrint(type); // Print the details of the tree based on type
                         break;
                     }
                     default: {
@@ -71,11 +88,20 @@ public class SeminarDB {
 
             }
         } catch (FileNotFoundException e) {
+            // Handle the case where the file cannot be found
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Parses a seminar input command and creates a Seminar object
+     *
+     * @param sc   Scanner to read from the command file
+     * @param line The line of input command
+     * @return A new Seminar object created from the parsed data
+     */
     Seminar parseInputCommand(Scanner sc, String[] line) {
+        // Parse the seminar details from the input lines
         int id = Integer.parseInt(line[1]);
         String title = sc.nextLine();
         String[] logistics = sc.nextLine().trim().split("\\s+");
@@ -89,39 +115,54 @@ public class SeminarDB {
         short y = Short.parseShort(logistics[3]);
         int cost = Integer.parseInt(logistics[4]);
 
+        // Return a new Seminar object
         return new Seminar(id, title, date, length, x, y, cost, keywords, desc);
     }
 
+    /**
+     * Processes the insert command to add a seminar to the database
+     *
+     * @param seminar The Seminar object to be inserted
+     */
     void processInsert(Seminar seminar) {
-        // Check bounding box
+        // Check if seminar is within the bounding box
         if ((seminar.x() < 0 || seminar.x() >= this.worldSize) || (seminar.y() < 0 || seminar.y() >= this.worldSize)) {
             System.out.printf("Insert FAILED - Bad x, y coordinates: %d, %d\n", seminar.x(), seminar.y());
             return;
         }
-        // Make sure Seminar has not already been inserted
+
+        // Check if the seminar already exists in the database
         if (!idBST.insertUnique(seminar.id(), seminar)) {
             System.out.printf("Insert FAILED - There is already a record with ID %d\n", seminar.id());
             return;
         }
 
+        // Insert seminar into all relevant trees
         costBST.insert(seminar.cost(), seminar);
         dateBST.insert(seminar.date(), seminar);
-
         for (String keyword : seminar.keywords()) {
             keywordBST.insert(keyword, seminar);
         }
-
+        // Insert seminar into spatial binary tree
         locationBT.insertSeminar(seminar);
+
         System.out.printf("Successfully inserted record with ID %d\n", seminar.id());
         System.out.println(seminar);
     }
 
+    /**
+     * Processes the search command based on the search type and arguments
+     *
+     * @param type       The search type (e.g., ID, cost, date, keyword, location)
+     * @param searchArgs The arguments for the search
+     */
     void processSearch(String type, String[] searchArgs) {
         if (searchArgs == null || searchArgs.length == 0) {
             System.err.println("error: invalid search arguments");
             return;
         }
 
+        // Perform the search based on the search type
         switch (type) {
             case "ID": {
                 if (searchArgs.length != 1) return;
@@ -200,13 +241,20 @@ public class SeminarDB {
         }
     }
 
+    /**
+     * Processes the delete command to remove a seminar from the database
+     *
+     * @param id The ID of the seminar to be deleted
+     */
     void processDelete(int id) {
+        // Remove seminar from the ID BST
         Seminar seminar = idBST.remove(id);
         if (seminar == null) {
             System.out.printf("Delete FAILED -- There is no record with ID %d\n", id);
             return;
         }
 
+        // Remove seminar from other trees and spatial binary tree
         costBST.remove(seminar.cost(), seminar);
         dateBST.remove(seminar.date(), seminar);
         for (String keyword : seminar.keywords()) {
@@ -217,6 +265,11 @@ public class SeminarDB {
 
     }
 
+    /**
+     * Processes the print command to display the contents of the trees
+     *
+     * @param type The type of tree to print (e.g., ID, cost, date, keyword, location)
+     */
     void processPrint(String type) {
         switch (type) {
             case "ID": {
@@ -243,6 +296,9 @@ public class SeminarDB {
                 System.out.println("Location Tree:");
                 locationBT.dump();
                 break;
+            }
+            default: {
+                System.err.println("error: invalid print type");
             }
         }
     }
