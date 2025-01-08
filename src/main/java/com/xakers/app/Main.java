@@ -1,8 +1,8 @@
 package main.java.com.xakers.app;
 
 /**
- * Main class to run SeminarTree application
- * Reads input from command-line arguments to set up a world size and a command file then loads the command file into the SeminarDB controller
+ * Main class to run SeminarTree application.
+ * Reads input from command-line arguments to set up a world size and a command file then loads the command file into the SeminarDB controller.
  *
  * @author Xavier Akers
  * @version 2025-01-08

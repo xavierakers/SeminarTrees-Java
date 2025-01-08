@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * SeminarDB class represents a database of seminars
- * Operations include insert, delete, search, and print
- * based on different attributes such as ID, cost, date, keyword, and location
+ * SeminarDB class represents a database of seminars.
+ * Operations include insert, delete, search, and print.
+ * based on different attributes such as ID, cost, date, keyword, and location.
  *
  * @author Xavier Akers
  * @version 2025-01-08
@@ -28,9 +28,9 @@ public class SeminarDB {
     private final BinTree locationBT;                           // Binary Tree for storing seminar location
 
     /**
-     * Constructor to initialize the SeminarDB with a specified world size
+     * Constructor to initialize the SeminarDB with a specified world size.
      *
-     * @param worldSize The size of the bounding box for the spatial binary tree
+     * @param worldSize The size of the bounding box for the spatial binary tree.
      */
     public SeminarDB(int worldSize) {
         this.worldSize = worldSize;
@@ -42,9 +42,9 @@ public class SeminarDB {
     }
 
     /**
-     * Load commands from a file and processes each command (insert, search, delete, print)
+     * Load commands from a file and processes each command (insert, search, delete, print).
      *
-     * @param filename The file path containing the commands
+     * @param filename The file path containing the commands.
      */
     public void load(String filename) {
         try (Scanner sc = new Scanner(new File(filename))) {
@@ -94,11 +94,11 @@ public class SeminarDB {
     }
 
     /**
-     * Parses a seminar input command and creates a Seminar object
+     * Parses a seminar input command and creates a Seminar object.
      *
-     * @param sc   Scanner to read from the command file
-     * @param line The line of input command
-     * @return A new Seminar object created from the parsed data
+     * @param sc   Scanner to read from the command file.
+     * @param line The line of input command.
+     * @return A new Seminar object created from the parsed data.
      */
     Seminar parseInputCommand(Scanner sc, String[] line) {
         // Parse the seminar details from the input lines
@@ -120,9 +120,9 @@ public class SeminarDB {
     }
 
     /**
-     * Processes the insert command to add a seminar to the database
+     * Processes the insert command to add a seminar to the database.
      *
-     * @param seminar The Seminar object to be inserted
+     * @param seminar The Seminar object to be inserted.
      */
     void processInsert(Seminar seminar) {
         // Check if seminar is within the bounding box
@@ -151,10 +151,10 @@ public class SeminarDB {
     }
 
     /**
-     * Processes the search command based on the search type and arguments
+     * Processes the search command based on the search type and arguments.
      *
-     * @param type       The search type (e.g., ID, cost, date, keyword, location)
-     * @param searchArgs The arguments for the search
+     * @param type       The search type (e.g., ID, cost, date, keyword, location).
+     * @param searchArgs The arguments for the search.
      */
     void processSearch(String type, String[] searchArgs) {
         if (searchArgs == null || searchArgs.length == 0) {
@@ -242,9 +242,9 @@ public class SeminarDB {
     }
 
     /**
-     * Processes the delete command to remove a seminar from the database
+     * Processes the delete command to remove a seminar from the database.
      *
-     * @param id The ID of the seminar to be deleted
+     * @param id The ID of the seminar to be deleted.
      */
     void processDelete(int id) {
         // Remove seminar from the ID BST
@@ -266,9 +266,9 @@ public class SeminarDB {
     }
 
     /**
-     * Processes the print command to display the contents of the trees
+     * Processes the print command to display the contents of the trees.
      *
-     * @param type The type of tree to print (e.g., ID, cost, date, keyword, location)
+     * @param type The type of tree to print (e.g., ID, cost, date, keyword, location).
      */
     void processPrint(String type) {
         switch (type) {
